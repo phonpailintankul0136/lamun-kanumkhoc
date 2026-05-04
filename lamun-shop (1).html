@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>ร้านละมุน ขนมครก 🥥</title>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+:root {
+  --cream: #FFF8E7;
+  --yellow: #FFD966;
+  --yellow-deep: #F4B942;
+  --brown: #9B6B45;
+  --text-dark: #5C3D2E;
+  --text-mid: #8B6347;
+  --green: #66BB6A;
+  --pink: #F06292;
+  --blue: #42A5F5;
+  --card: rgba(255,255,255,0.9);
+  --shadow: rgba(155,107,69,0.13);
+  --nav-h: 68px;
+  --header-h: 126px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; font-family: 'Mitr', sans-serif; background: #FFF8E7; color: var(--text-dark); }
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: radial-gradient(circle, #FFD96630 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── HEADER ── */
+.header {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: var(--header-h);
+  background: linear-gradient(135deg, #FFD966, #F4B942);
+  z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 3px 16px rgba(244,185,66,0.4);
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-mascot { font-size: 46px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+.header-title h1 { font-size: 18px; font-weight: 600; color: #5C3D2E; line-height: 1.25; }
+.header-title p { font-size: 11px; color: #7A5230; margin-top: 1px; }
+.month-pill {
+  background: rgba(255,255,255,0.6);
+  border-radius: 50px;
+  padding: 6px 11px;
+  font-size: 13px; font-weight: 500;
+  color: #5C3D2E;
+  border: none;
+  font-family: 'Mitr', sans-serif;
+  cursor: pointer; outline: none;
+  width: 96px;
+  -webkit-appearance: none;
+}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: rgba(255,255,255,0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1.5px solid rgba(255,217,102,0.5);
+  display: grid; grid-template-columns: repeat(4,1fr);
+  z-index: 50;
+  box-shadow: 0 -4px 20px rgba(155,107,69,0.1);
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; cursor: pointer;
+  border: none; background: transparent;
+  font-family: 'Mitr', sans-serif;
+  font-size: 10px; font-weight: 500;
+  color: #BFAA90;
+  padding: 8px 4px;
+  transition: color 0.2s;
+  position: relative;
+}
+.nav-icon { font-size: 24px; transition: transform 0.2s; display: block; }
+.nav-item.active { color: var(--text-dark); }
+.nav-item.active .nav-icon { transform: scale(1.18); }
+.nav-item.active::after {
+  content: '';
+  position: absolute; bottom: 0; left: 22%; right: 22%;
+  height: 3px; border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg,#FFD966,#F4B942);
+}
+
+/* ── SCROLL AREA ── */
+.pages-wrap {
+  position: fixed;
+  top: var(--header-h); bottom: var(--nav-h);
+  left: 0; right: 0;
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1;
+}
+.pages-wrap::-webkit-scrollbar { display: none; }
+
+.page { display: none; padding: 14px 14px 8px; animation: fadeUp 0.28s ease; }
+.page.active { display: block; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+/* ── CARD ── */
+.card {
+  background: var(--card);
+  border-radius: 18px; padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 3px 16px var(--shadow);
+  border: 1.5px solid rgba(255,217,102,0.4);
+}
+.card-title {
+  font-size: 15px; font-weight: 600; color: var(--text-dark);
+  margin-bottom: 13px;
+  display: flex; align-items: center; gap: 7px;
+}
+
+/* ── SUMMARY ── */
+.sum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 13px; }
+.sum-box {
+  border-radius: 14px; padding: 13px 10px; text-align: center;
+  background: linear-gradient(135deg,#FFF3C4,#FFE4A0);
+  border: 1.5px solid rgba(255,217,102,0.5);
+}
+.sum-box.inc  { background: linear-gradient(135deg,#D4EDDA,#A8D5A2); border-color:#A8D5A2; }
+.sum-box.exp  { background: linear-gradient(135deg,#FFE0E6,#FFB5C8); border-color:#FFB5C8; }
+.sum-box.pgood{ background: linear-gradient(135deg,#D1ECF1,#9ECFE8); border-color:#9ECFE8; }
+.sum-label { font-size: 11px; color: var(--text-mid); margin-bottom: 3px; }
+.sum-val { font-size: 20px; font-weight: 700; color: var(--text-dark); }
+
+/* ── PROGRESS ── */
+.goal-row { display:flex; justify-content:space-between; font-size:12px; color:var(--text-mid); margin-bottom:5px; }
+.prog-track { height:13px; background:#FFE4A0; border-radius:10px; overflow:hidden; }
+.prog-fill {
+  height:100%; border-radius:10px;
+  background: linear-gradient(90deg,#66BB6A,#43A047);
+  transition: width 0.8s cubic-bezier(.4,0,.2,1);
+}
+.prog-fill.warn { background: linear-gradient(90deg,#FFD966,#F4B942); }
+.prog-fill.over { background: linear-gradient(90deg,#42A5F5,#1E88E5); }
+
+/* ── QUICK BTNS ── */
+.quick-btns { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.quick-btn {
+  border:none; border-radius:14px; padding:15px 10px;
+  font-family:'Mitr',sans-serif; font-size:15px; font-weight:600;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px;
+  transition:transform 0.15s; box-shadow:0 3px 10px rgba(0,0,0,0.08);
+}
+.quick-btn:active { transform:scale(0.95); }
+.qb-inc { background:linear-gradient(135deg,#A8D5A2,#66BB6A); color:#1B5E20; }
+.qb-exp { background:linear-gradient(135deg,#FFB5C8,#F06292); color:#880E4F; }
+
+/* ── FORM ── */
+.form-group { margin-bottom:12px; }
+.form-group label { display:block; font-size:12px; color:var(--text-mid); margin-bottom:4px; font-weight:500; }
+.form-group input, .form-group select {
+  width:100%; padding:13px 14px;
+  border:1.5px solid #FFD966; border-radius:12px;
+  font-family:'Mitr',sans-serif; font-size:15px;
+  background:rgba(255,255,255,0.85); color:var(--text-dark);
+  outline:none; -webkit-appearance:none; appearance:none;
+  transition:border-color 0.2s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color:#F4B942;
+  box-shadow:0 0 0 3px rgba(244,185,66,0.2);
+}
+.form-group input[type=number] { font-size:20px; font-weight:700; }
+.form-row2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+/* ── TYPE TOGGLE ── */
+.type-toggle { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:12px; }
+.type-btn {
+  padding:13px; border-radius:12px; border:2px solid #E0E0E0;
+  font-family:'Mitr',sans-serif; font-size:14px; font-weight:500;
+  cursor:pointer; text-align:center;
+  background:rgba(255,255,255,0.6); color:var(--text-mid);
+  transition:all 0.2s;
+}
+.type-btn.sel-inc  { background:#D4EDDA; border-color:#66BB6A; color:#1B5E20; font-weight:600; }
+.type-btn.sel-exp  { background:#FFE0E6; border-color:#F06292; color:#880E4F; font-weight:600; }
+
+/* ── BIG SAVE BTN ── */
+.btn-save {
+  width:100%; padding:15px;
+  border:none; border-radius:14px;
+  font-family:'Mitr',sans-serif; font-size:16px; font-weight:600;
+  cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  transition:all 0.2s;
+}
+.btn-save:active { transform:scale(0.97); }
+.btn-yellow { background:linear-gradient(135deg,#FFD966,#F4B942); color:#5C3D2E; box-shadow:0 4px 14px rgba(244,185,66,0.4); }
+.btn-blue   { background:linear-gradient(135deg,#9ECFE8,#42A5F5); color:#0D47A1; box-shadow:0 4px 14px rgba(66,165,245,0.3); }
+
+/* ── TX ROWS ── */
+.tx-row {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 0; border-bottom:1px solid rgba(255,217,102,0.3);
+}
+.tx-row:last-child { border-bottom:none; }
+.tx-dot { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.dot-inc { background:#D4EDDA; }
+.dot-exp { background:#FFE0E6; }
+.tx-info { flex:1; min-width:0; }
+.tx-cat { font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tx-sub { font-size:11px; color:var(--text-mid); }
+.tx-amt { font-size:15px; font-weight:700; flex-shrink:0; }
+.amt-inc { color:#2E7D32; }
+.amt-exp { color:#C62828; }
+
+/* ── STOCK ── */
+.stock-item {
+  display:flex; align-items:center; gap:10px;
+  padding:12px; background:rgba(255,243,196,0.55);
+  border-radius:13px; margin-bottom:8px;
+  border:1px solid rgba(255,217,102,0.4);
+}
+.stock-emoji { font-size:26px; flex-shrink:0; }
+.stock-info { flex:1; min-width:0; }
+.stock-name { font-size:13px; font-weight:500; line-height:1.3; }
+.stock-unit { font-size:11px; color:var(--text-mid); }
+.stock-ctrl { display:flex; align-items:center; gap:7px; flex-shrink:0; }
+.qty-btn {
+  width:38px; height:38px; border-radius:50%;
+  border:none; background:#FFD966; color:#5C3D2E;
+  font-size:20px; font-weight:700; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.15s;
+}
+.qty-btn:active { background:#F4B942; transform:scale(0.91); }
+.qty-input {
+  width:54px; text-align:center; padding:7px 4px;
+  border:1.5px solid #FFD966; border-radius:8px;
+  font-family:'Mitr',sans-serif; font-size:17px; font-weight:700;
+  color:var(--text-dark); background:rgba(255,255,255,0.85); outline:none;
+}
+
+/* ── GAS ── */
+.gas-hero {
+  background:linear-gradient(135deg,#E3F2FD,#BBDEFB);
+  border-radius:16px; padding:18px;
+  text-align:center; border:1.5px solid #90CAF9;
+  margin-bottom:14px;
+  display:flex; align-items:center; justify-content:center; gap:16px;
+}
+.gas-big { font-size:56px; font-weight:700; color:#1565C0; line-height:1; }
+.gas-meta p { font-size:12px; color:#1976D2; }
+.gas-meta strong { font-size:16px; color:#0D47A1; }
+.gas-row { display:flex; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,217,102,0.3); }
+.gas-row:last-child { border-bottom:none; }
+.gas-icon-sm { font-size:22px; width:34px; text-align:center; }
+.gas-info-r { flex:1; }
+.gas-date-r { font-size:13px; font-weight:600; }
+.gas-note-r { font-size:11px; color:var(--text-mid); }
+.gas-cost-r { font-size:15px; font-weight:700; color:#1565C0; }
+
+/* ── SECTION HEADER ── */
+.sec-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+.sec-title { font-size:14px; font-weight:600; }
+.sec-month {
+  padding:5px 10px; border-radius:50px;
+  border:1.5px solid #FFD966; font-family:'Mitr',sans-serif;
+  font-size:12px; background:rgba(255,255,255,0.85); color:var(--text-dark);
+  outline:none; -webkit-appearance:none; cursor:pointer;
+}
+
+/* ── EMPTY ── */
+.empty { text-align:center; padding:28px 16px; }
+.empty .ei { font-size:38px; display:block; margin-bottom:6px; }
+.empty p { font-size:13px; color:var(--text-mid); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-mascot">🥥</div>
+    <div class="header-title">
+      <h1>ร้านละมุน ขนมครก</h1>
+      <p>เป้ากำไร 20,000 ฿/เดือน ✨</p>
+    </div>
+  </div>
+  <select class="month-pill" id="global-month" onchange="onMonthChange()"></select>
+</div>
+
+<!-- PAGES -->
+<div class="pages-wrap">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="quick-btns">
+      <button class="quick-btn qb-inc" onclick="goAdd('income')">💚 + รายรับ</button>
+      <button class="quick-btn qb-exp" onclick="goAdd('expense')">🌸 + รายจ่าย</button>
+    </div>
+    <div class="card">
+      <div class="card-title">🌟 สรุปเดือนนี้</div>
+      <div class="sum-grid">
+        <div class="sum-box inc"><div class="sum-label">💚 รายรับ</div><div class="sum-val" id="d-inc">—</div></div>
+        <div class="sum-box exp"><div class="sum-label">🌸 รายจ่าย</div><div class="sum-val" id="d-exp">—</div></div>
+        <div class="sum-box" id="d-pbox" style="grid-column:1/-1"><div class="sum-label">🏆 กำไรสุทธิ</div><div class="sum-val" id="d-prof">—</div></div>
+      </div>
+      <div class="goal-row"><span>🎯 ความคืบหน้า (20,000 ฿)</span><span id="d-pct" style="font-weight:700">0%</span></div>
+      <div class="prog-track"><div class="prog-fill warn" id="d-bar" style="width:0%"></div></div>
+    </div>
+    <div class="card">
+      <div class="sec-header"><div class="sec-title">📋 รายการล่าสุด</div></div>
+      <div id="d-recent"><div class="empty"><span class="ei">🍥</span><p>ยังไม่มีข้อมูล กดปุ่มด้านบนเพื่อเริ่มบันทึก!</p></div></div>
+    </div>
+  </div>
+
+  <!-- INCOME/EXPENSE -->
+  <div class="page" id="page-income">
+    <div class="card">
+      <div class="card-title">➕ บันทึกรายการ</div>
+      <div class="type-toggle">
+        <button class="type-btn sel-inc" id="tt-inc" onclick="setType('income')">💚 รายรับ</button>
+        <button class="type-btn" id="tt-exp" onclick="setType('expense')">🌸 รายจ่าย</button>
+      </div>
+      <div class="form-row2">
+        <div class="form-group"><label>วันที่</label><input type="date" id="tx-date"></div>
+        <div class="form-group"><label>หมวดหมู่</label>
+          <select id="tx-cat">
+            <option value="ยอดขาย">🥥 ยอดขาย</option>
+            <option value="อื่นๆ">📝 อื่นๆ</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>จำนวนเงิน (บาท)</label><input type="number" id="tx-amt" placeholder="0" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label>หมายเหตุ</label><input type="text" id="tx-note" placeholder="รายละเอียด..."></div>
+      <button class="btn-save btn-yellow" onclick="saveTx()">💾 บันทึกรายการ</button>
+    </div>
+    <div class="card">
+      <div class="sec-header">
+        <div class="sec-title">📅 ประวัติรายการ</div>
+        <select class="sec-month" id="hist-month" onchange="loadHistory()"></select>
+      </div>
+      <div id="hist-list"><div class="empty"><span class="ei">📝</span><p>ยังไม่มีรายการ</p></div></div>
+    </div>
+  </div>
+
+  <!-- STOCK -->
+  <div class="page" id="page-stock">
+    <div class="card">
+      <div class="card-title">📦 นับสต๊อกวัตถุดิบ</div>
+      <p style="font-size:12px;color:var(--text-mid);margin-bottom:12px;">อัปเดตปริมาณแล้วกดบันทึก</p>
+      <div id="stock-list"></div>
+      <button class="btn-save btn-yellow" onclick="saveStock()" style="margin-top:4px">💾 บันทึกสต๊อก</button>
+    </div>
+  </div>
+
+  <!-- GAS -->
+  <div class="page" id="page-gas">
+    <div class="card">
+      <div class="card-title">🔥 บันทึกการเติมแก๊ส</div>
+      <div class="gas-hero">
+        <div class="gas-big" id="gas-cnt">0</div>
+        <div class="gas-meta">
+          <p>จำนวนครั้ง / เดือนนี้</p>
+          <p style="margin-top:6px">ค่าแก๊สรวม</p>
+          <strong id="gas-tot">0 ฿</strong>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="form-group"><label>วันที่เติมแก๊ส</label><input type="date" id="gas-date"></div>
+        <div class="form-group"><label>ค่าแก๊ส (บาท)</label><input type="number" id="gas-cost" placeholder="0" inputmode="decimal"></div>
+      </div>
+      <div class="form-group"><label>หมายเหตุ</label><input type="text" id="gas-note" placeholder="เช่น ถังใหญ่ 15 กก."></div>
+      <button class="btn-save btn-blue" onclick="saveGas()">🔥 บันทึกการเติมแก๊ส</button>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 ประวัติการเติมแก๊ส</div>
+      <div id="gas-hist"><div class="empty"><span class="ei">🔥</span><p>ยังไม่มีประวัติ</p></div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-item active" id="nav-dashboard" onclick="showPage('dashboard',this)">
+    <span class="nav-icon">📊</span>ภาพรวม
+  </button>
+  <button class="nav-item" id="nav-income" onclick="showPage('income',this)">
+    <span class="nav-icon">💰</span>รายรับ-จ่าย
+  </button>
+  <button class="nav-item" id="nav-stock" onclick="showPage('stock',this)">
+    <span class="nav-icon">📦</span>สต๊อก
+  </button>
+  <button class="nav-item" id="nav-gas" onclick="showPage('gas',this)">
+    <span class="nav-icon">🔥</span>แก๊ส
+  </button>
+</nav>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeehExUvm0TPt43Be9bwlsj8M95egLr83QZUj6esnvnHvnRgyZduUj1BPY_gHSbMgAcg/exec';
+const SHEET_URL  = 'https://docs.google.com/spreadsheets/d/1MTv3LJqe2zn9OWuTfj-tqIqh68YowCiAnB1otISRsHM/gviz/tq?tqx=out:json';
+const GOAL = 20000;
+const MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+const STOCKS = [
+  {id:'flour_rice',  name:'แป้งข้าวเจ้า ตราช้างสามเศียร', unit:'กก.',      e:'🌾'},
+  {id:'flour_all',   name:'แป้งอเนกประสงค์ ตราดาว',       unit:'กก.',      e:'⭐'},
+  {id:'sugar_white', name:'น้ำตาลทราย',                    unit:'กก.',      e:'🍬'},
+  {id:'sugar_palm',  name:'น้ำตาลปี๊บ',                   unit:'กก.',      e:'🫙'},
+  {id:'corn',        name:'ข้าวโพด',                       unit:'ฝัก/กก.', e:'🌽'},
+  {id:'pumpkin',     name:'ฟักทอง',                        unit:'กก.',      e:'🎃'},
+];
+let DB = {txs:[], gas:[]};
+let txType = 'income';
+
+/* ─── INIT ─── */
+function init() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('tx-date').value  = today;
+  document.getElementById('gas-date').value = today;
+  fillMonthSelects();
+  buildStocks();
+  setTimeout(refreshAll, 400);
+}
+function fillMonthSelects() {
+  const now = new Date(); let o = '';
+  for (let i=5; i>=0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const v = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const l = `${MONTHS_TH[d.getMonth()]} ${d.getFullYear()+543}`;
+    o += `<option value="${v}" ${i===0?'selected':''}>${l}</option>`;
+  }
+  document.getElementById('global-month').innerHTML = o;
+  document.getElementById('hist-month').innerHTML   = o;
+}
+function buildStocks() {
+  document.getElementById('stock-list').innerHTML = STOCKS.map(s=>`
+    <div class="stock-item">
+      <span class="stock-emoji">${s.e}</span>
+      <div class="stock-info">
+        <div class="stock-name">${s.name}</div>
+        <div class="stock-unit">${s.unit}</div>
+      </div>
+      <div class="stock-ctrl">
+        <button class="qty-btn" onclick="chQty('${s.id}',-1)">−</button>
+        <input class="qty-input" type="number" id="s-${s.id}" value="0" min="0" inputmode="decimal">
+        <button class="qty-btn" onclick="chQty('${s.id}',1)">+</button>
+      </div>
+    </div>`).join('');
+}
+function chQty(id, d) {
+  const e = document.getElementById('s-'+id);
+  e.value = Math.max(0, parseInt(e.value||0)+d);
+}
+
+/* ─── NAV ─── */
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  document.querySelector('.pages-wrap').scrollTop = 0;
+  if(name==='dashboard') loadDash();
+  if(name==='income')    loadHistory();
+  if(name==='gas')       loadGasPage();
+}
+function onMonthChange() {
+  const v = document.getElementById('global-month').value;
+  document.getElementById('hist-month').value = v;
+  loadDash(); loadHistory();
+}
+function goAdd(type) {
+  showPage('income', document.getElementById('nav-income'));
+  setType(type);
+  setTimeout(()=>document.getElementById('tx-amt').focus(), 300);
+}
+
+/* ─── TYPE TOGGLE ─── */
+function setType(t) {
+  txType = t;
+  document.getElementById('tt-inc').className = 'type-btn'+(t==='income'?' sel-inc':'');
+  document.getElementById('tt-exp').className = 'type-btn'+(t==='expense'?' sel-exp':'');
+  const cat = document.getElementById('tx-cat');
+  cat.innerHTML = t==='income'
+    ? `<option value="ยอดขาย">🥥 ยอดขาย</option><option value="อื่นๆ">📝 อื่นๆ</option>`
+    : `<option value="วัตถุดิบ">🛒 วัตถุดิบ</option><option value="แก๊ส">🔥 แก๊ส</option><option value="ค่าแรง">👩 ค่าแรง</option><option value="ค่าเช่า">🏠 ค่าเช่า</option><option value="อื่นๆ">📝 อื่นๆ</option>`;
+}
+
+/* ─── LOAD DATA ─── */
+async function refreshAll() {
+  await fetchSheet('รายรับรายจ่าย');
+  await fetchSheet('แก๊ส');
+  await fetchSheet('สต๊อก');
+  loadDash(); loadHistory(); loadGasPage();
+}
+function fetchSheet(name) {
+  return new Promise(res=>{
+    fetch(`${SHEET_URL}&sheet=${encodeURIComponent(name)}&t=${Date.now()}`)
+      .then(r=>r.text()).then(txt=>{
+        const json = txt.replace(/^[^(]+\(/,'').replace(/\);?\s*$/,'');
+        try {
+          const data = JSON.parse(json);
+          const rows = data.table?.rows||[];
+          if(name==='รายรับรายจ่าย') {
+            DB.txs = rows.map(r=>{ const v=r.c.map(c=>c?c.v:null); return {date:v[0],type:v[1],cat:v[2],amt:parseFloat(v[3])||0,note:v[4]}; }).filter(t=>t.date);
+          } else if(name==='แก๊ส') {
+            DB.gas = rows.map(r=>{ const v=r.c.map(c=>c?c.v:null); return {date:v[0],cost:parseFloat(v[1])||0,note:v[2]}; }).filter(t=>t.date);
+          } else if(name==='สต๊อก' && rows.length>0) {
+            const v = rows[rows.length-1].c.map(c=>c?c.v:null);
+            STOCKS.forEach((s,i)=>{ const el=document.getElementById('s-'+s.id); if(el&&v[i+1]!=null) el.value=v[i+1]||0; });
+          }
+        } catch(e){}
+        res();
+      }).catch(()=>res());
+  });
+}
+
+/* ─── DASHBOARD ─── */
+function loadDash() {
+  const [yr,mo] = document.getElementById('global-month').value.split('-').map(Number);
+  const txs = DB.txs.filter(t=>{ const d=new Date(t.date); return d.getFullYear()===yr&&d.getMonth()+1===mo; });
+  const inc  = txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amt,0);
+  const exp  = txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amt,0);
+  const prof = inc-exp;
+  const pct  = Math.min(200, Math.round((prof/GOAL)*100));
+
+  document.getElementById('d-inc').textContent  = fmt(inc)+' ฿';
+  document.getElementById('d-exp').textContent  = fmt(exp)+' ฿';
+  document.getElementById('d-prof').textContent = fmt(prof)+' ฿';
+  document.getElementById('d-pct').textContent  = pct+'%';
+
+  const bar = document.getElementById('d-bar');
+  bar.style.width = Math.min(100,pct)+'%';
+  bar.className = 'prog-fill'+(pct>=100?' over':pct>=50?'':' warn');
+  document.getElementById('d-pbox').className = 'sum-box'+(prof>=GOAL?' pgood':'');
+
+  const recent = [...txs].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+  const el = document.getElementById('d-recent');
+  el.innerHTML = recent.length ? recent.map(txRow).join('') :
+    '<div class="empty"><span class="ei">🍥</span><p>ยังไม่มีรายการ กดปุ่มด้านบนเพื่อเริ่ม!</p></div>';
+}
+
+/* ─── HISTORY ─── */
+function loadHistory() {
+  const [yr,mo] = document.getElementById('hist-month').value.split('-').map(Number);
+  const txs = DB.txs.filter(t=>{ const d=new Date(t.date); return d.getFullYear()===yr&&d.getMonth()+1===mo; })
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el = document.getElementById('hist-list');
+  el.innerHTML = txs.length ? txs.map(txRow).join('') :
+    '<div class="empty"><span class="ei">📝</span><p>ไม่มีรายการเดือนนี้</p></div>';
+}
+
+function txRow(t) {
+  const inc = t.type==='income';
+  return `<div class="tx-row">
+    <div class="tx-dot ${inc?'dot-inc':'dot-exp'}">${inc?'💚':'🌸'}</div>
+    <div class="tx-info">
+      <div class="tx-cat">${t.cat||'-'}${t.note?' — '+t.note:''}</div>
+      <div class="tx-sub">${fmtDate(t.date)}</div>
+    </div>
+    <div class="tx-amt ${inc?'amt-inc':'amt-exp'}">${inc?'+':'-'}${fmt(t.amt)} ฿</div>
+  </div>`;
+}
+
+/* ─── GAS PAGE ─── */
+function loadGasPage() {
+  const now = new Date();
+  const thisM = DB.gas.filter(g=>{ const d=new Date(g.date); return d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth(); });
+  document.getElementById('gas-cnt').textContent = thisM.length;
+  document.getElementById('gas-tot').textContent = fmt(thisM.reduce((s,g)=>s+g.cost,0))+' ฿';
+
+  const sorted = [...DB.gas].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,10);
+  const el = document.getElementById('gas-hist');
+  el.innerHTML = sorted.length ? sorted.map(g=>`
+    <div class="gas-row">
+      <div class="gas-icon-sm">🔥</div>
+      <div class="gas-info-r">
+        <div class="gas-date-r">${fmtDate(g.date)}</div>
+        <div class="gas-note-r">${g.note||'—'}</div>
+      </div>
+      <div class="gas-cost-r">${fmt(g.cost)} ฿</div>
+    </div>`).join('') :
+    '<div class="empty"><span class="ei">🔥</span><p>ยังไม่มีประวัติ</p></div>';
+}
+
+/* ─── SAVES ─── */
+function saveTx() {
+  const date = document.getElementById('tx-date').value;
+  const cat  = document.getElementById('tx-cat').value;
+  const amt  = document.getElementById('tx-amt').value;
+  const note = document.getElementById('tx-note').value;
+  if(!date||!amt||parseFloat(amt)<=0) {
+    Swal.fire({icon:'warning',title:'กรอกไม่ครบ',text:'กรุณากรอกวันที่และจำนวนเงิน',confirmButtonColor:'#F4B942'});
+    return;
+  }
+  Swal.fire({title:'⏳ กำลังบันทึก...',allowOutsideClick:false,didOpen:()=>Swal.showLoading(),confirmButtonColor:'#F4B942'});
+  const p = new URLSearchParams({action:'addTransaction',date,type:txType,category:cat,amount:amt,note,callback:'jcb'});
+  sendJSONP(SCRIPT_URL+'?'+p, ()=>{
+    DB.txs.push({date,type:txType,cat,amt:parseFloat(amt),note});
+    Swal.fire({icon:'success',title:'✅ บันทึกสำเร็จ!',text:`${txType==='income'?'💚 รายรับ':'🌸 รายจ่าย'} ${fmt(parseFloat(amt))} บาท`,confirmButtonColor:'#F4B942',timer:2000,timerProgressBar:true});
+    document.getElementById('tx-amt').value='';
+    document.getElementById('tx-note').value='';
+    loadDash(); loadHistory();
+  });
+}
+function saveStock() {
+  const s = {}; STOCKS.forEach(it=>{ s[it.id]=parseFloat(document.getElementById('s-'+it.id).value)||0; });
+  Swal.fire({title:'📦 กำลังบันทึกสต๊อก...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+  const today = new Date().toISOString().split('T')[0];
+  const p = new URLSearchParams({action:'addStock',date:today,...s,callback:'jcb'});
+  sendJSONP(SCRIPT_URL+'?'+p, ()=>{
+    Swal.fire({icon:'success',title:'✅ บันทึกสต๊อกสำเร็จ!',confirmButtonColor:'#F4B942',timer:2000,timerProgressBar:true});
+  });
+}
+function saveGas() {
+  const date = document.getElementById('gas-date').value;
+  const cost = document.getElementById('gas-cost').value;
+  const note = document.getElementById('gas-note').value;
+  if(!date){Swal.fire({icon:'warning',title:'กรุณากรอกวันที่',confirmButtonColor:'#F4B942'});return;}
+  Swal.fire({title:'🔥 กำลังบันทึกแก๊ส...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+  const p = new URLSearchParams({action:'addGas',date,cost:cost||0,note,callback:'jcb'});
+  sendJSONP(SCRIPT_URL+'?'+p, ()=>{
+    DB.gas.push({date,cost:parseFloat(cost)||0,note});
+    Swal.fire({icon:'success',title:'🔥 บันทึกสำเร็จ!',confirmButtonColor:'#F4B942',timer:2000,timerProgressBar:true});
+    document.getElementById('gas-cost').value='';
+    document.getElementById('gas-note').value='';
+    loadGasPage();
+  });
+}
+
+/* ─── JSONP ─── */
+function sendJSONP(url, cb) {
+  const n = 'jcb_'+Date.now();
+  url = url.replace(/callback=[^&]+/,'callback='+n);
+  const s = document.createElement('script');
+  let done=false;
+  window[n]=d=>{done=true;delete window[n];try{document.body.removeChild(s);}catch(e){}cb(d);};
+  s.onerror=()=>{if(!done){done=true;delete window[n];try{document.body.removeChild(s);}catch(e){}cb({});}};
+  setTimeout(()=>{if(!done){done=true;try{delete window[n];document.body.removeChild(s);}catch(e){}cb({});}},8000);
+  s.src=url; document.body.appendChild(s);
+}
+
+/* ─── HELPERS ─── */
+function fmt(n){ return Number(n).toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function fmtDate(d){
+  if(!d) return '-';
+  const dt=new Date(d);
+  return `${dt.getDate()} ${MONTHS_TH[dt.getMonth()]} ${dt.getFullYear()+543}`;
+}
+
+init();
+</script>
+</body>
+</html>
